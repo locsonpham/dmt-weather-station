@@ -1,1 +1,2 @@
-Add Username and Tel
+git remote add origin https://github.com/locsonpham/dmt-weather-station.git
+git push -u origin master
