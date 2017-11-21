@@ -1,1 +1,1 @@
-.\Obj\mbfuncdiag.o: Src\freemodbus\modbus\functions\mbfuncdiag.c
+.\obj\mbfuncdiag.o: Src\freemodbus\modbus\functions\mbfuncdiag.c

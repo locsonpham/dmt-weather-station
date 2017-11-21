@@ -1,5 +1,5 @@
-.\Obj\ringbuf.o: Src\ringbuf.c
-.\Obj\ringbuf.o: Src\ringbuf.h
-.\Obj\ringbuf.o: C:\Keil\ARM\ARMCC\bin\..\include\stdint.h
-.\Obj\ringbuf.o: C:\Keil\ARM\ARMCC\bin\..\include\stdlib.h
-.\Obj\ringbuf.o: C:\Keil\ARM\ARMCC\bin\..\include\string.h
+.\obj\ringbuf.o: Src\ringbuf.c
+.\obj\ringbuf.o: Src\ringbuf.h
+.\obj\ringbuf.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
+.\obj\ringbuf.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdlib.h
+.\obj\ringbuf.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\string.h

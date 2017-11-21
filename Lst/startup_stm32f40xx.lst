@@ -855,11 +855,14 @@ ARM Macro Assembler    Page 14
   432 0000001C                 END
               00000000 
               00000000 
-Command Line: --debug --xref --cpu=Cortex-M4.fp --apcs=interwork --depend=.\Obj
-\startup_stm32f40xx.d -o.\Obj\startup_stm32f40xx.o -IC:\Keil\ARM\RV31\INC -IC:\
-Keil\ARM\CMSIS\Include -IC:\Keil\ARM\Inc\ST\STM32F4xx --predefine="__MICROLIB S
-ETA 1" --list=.\Lst\startup_stm32f40xx.lst ..\F4Lib\CMSIS\Device\ST\STM32F4xx\S
-ource\Templates\arm\startup_stm32f40xx.s
+Command Line: --debug --xref --diag_suppress=9931 --cpu=Cortex-M4.fp --apcs=int
+erwork --depend=.\obj\startup_stm32f40xx.d -o.\obj\startup_stm32f40xx.o -IG:\CO
+DING\PROJECTS\SensorHub_F4_Weather\RTE -IC:\Keil_v5\ARM\PACK\ARM\CMSIS\4.5.0\CM
+SIS\Include -IC:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\2.11.0\Drivers\CMSIS\Devic
+e\ST\STM32F4xx\Include --predefine="__MICROLIB SETA 1" --predefine="__UVISION_V
+ERSION SETA 521" --predefine="_RTE_ SETA 1" --predefine="STM32F407xx SETA 1" --
+list=.\lst\startup_stm32f40xx.lst ..\F4Lib\CMSIS\Device\ST\STM32F4xx\Source\Tem
+plates\arm\startup_stm32f40xx.s
 
 
 
@@ -2289,4 +2292,4 @@ rm\startup_stm32f40xx.s
 rm\startup_stm32f40xx.s
 Comment: __main used once
 2 symbols
-443 symbols in table
+446 symbols in table
