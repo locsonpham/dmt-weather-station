@@ -73,7 +73,7 @@ typedef struct __attribute__((packed, aligned(4)))
     uint8_t rainPercent; 
 	uint8_t rainPanelTemp;      
 	int rainSum;  
-	int windDir;          
+	int windDirect;          
 	int windSpeed;
     uint8_t out0;
     uint8_t out1;

@@ -22,9 +22,9 @@
 #define INFO(...)
 #endif
 
-#define USE_HMI
+//#define USE_HMI
 
-#define USE_EXT_FLASH
+//#define USE_EXT_FLASH
 
 
 /* Includes ------------------------------------------------------------------*/
@@ -101,7 +101,8 @@ typedef   bool BOOL;
 #include "ff.h"
 #include "sdcard.h"
 
-
+// MQTT
+#include "GPRS_MQTTClient.h"
 
 typedef uint8_t byte;
 

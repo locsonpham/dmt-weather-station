@@ -20,6 +20,8 @@
 #include "ringbuf.h"
 
 /* Private define ------------------------------------------------------------*/
+#define MQTT_Client
+ 
 /* Uncomment to use */
 #define SIM_USE_KEY
 #define SIM_USE_RST

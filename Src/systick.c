@@ -47,15 +47,11 @@ void SysTick_Handler(void)
     
     if (sys_delay>0) sys_delay--;
     
-    if (watchDogCnt >= 40)
-    {
-        watchDogCnt = 0;
-        WWDG_SetCounter(127);
-    }
-    
-    #ifdef USE_HMI
-        mbPolling();
-    #endif
+//    if (watchDogCnt >= 40)
+//    {
+//        watchDogCnt = 0;
+//        WWDG_SetCounter(127);
+//    }
     
     // ADC Average
     ADC_Average();
@@ -71,16 +67,16 @@ void SysTick_Handler(void)
         
         mainWDG++;
         
-        if (mainWDG >= 60)
-        {
-            NVIC_SystemReset();
-        }
+//        if (mainWDG >= 60)
+//        {
+//            NVIC_SystemReset();
+//        }
         
         // WindSpeed Sample
         WindSpeed_Sampling();
         
-        // Add log package
-        addLogPackage();
+//        // Add log package
+//        addLogPackage();
     }
 }
 
@@ -180,7 +176,8 @@ uint32_t CheckTimeout(Timeout_Type *t)
 	u32temp = t->start_time + t->timeout;
 	if(u32temp != t->crc)
     {
-			NVIC_SystemReset();   // reset system
+		INFO("Time CRC Err\n");
+		NVIC_SystemReset();   // reset system
     }
     
 	u32temp = GetTick();

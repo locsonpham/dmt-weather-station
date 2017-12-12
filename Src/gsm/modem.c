@@ -119,10 +119,10 @@ uint8_t MODEM_Init(void)
 			if(sysCfg.id[0] == '\0')
 				strcpy((char *)sysCfg.id, (char *)modemId);
 			
-			// Save IMEI if avaiable
-			#ifdef USE_EXT_FLASH
-			CFG_Save();
-			#endif
+//			// Save IMEI if avaiable
+//			#ifdef USE_EXT_FLASH
+//			CFG_Save();
+//			#endif
 		}
     }
 
@@ -1020,7 +1020,7 @@ uint8_t MODEM_CheckSIM(void)
 {
     COMM_Puts("AT+CPIN?\r");
     
-    if (MODEM_CheckResponse("OK", 5000) == 0)   // SIM Inserted
+    if (MODEM_CheckResponse("OK", 3000) == 0)   // SIM Inserted
     {
         simInserted = 1;
         return 0;

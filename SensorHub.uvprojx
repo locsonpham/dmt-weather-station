@@ -133,11 +133,11 @@
             <RunIndependent>0</RunIndependent>
             <UpdateFlashBeforeDebugging>1</UpdateFlashBeforeDebugging>
             <Capability>1</Capability>
-            <DriverSelection>4104</DriverSelection>
+            <DriverSelection>4100</DriverSelection>
           </Flash1>
           <bUseTDR>0</bUseTDR>
           <Flash2>STLink\ST-LINKIII-KEIL_SWO.dll</Flash2>
-          <Flash3></Flash3>
+          <Flash3>"" ()</Flash3>
           <Flash4></Flash4>
           <pFcarmOut></pFcarmOut>
           <pFcarmGrp></pFcarmGrp>
@@ -335,7 +335,7 @@
               <MiscControls>--c99</MiscControls>
               <Define>USE_STDPERIPH_DRIVER, STM32F4XX,HSE_VALUE = 8000000</Define>
               <Undefine></Undefine>
-              <IncludePath>.\User;.\Src;..\F4Lib\CMSIS\Device\ST\STM32F4xx\Include;..\F4Lib\CMSIS\Device\ST\STM32F4xx\Source\Templates\arm;..\F4Lib\STM32F4xx_StdPeriph_Driver\inc;.\Src\fatfs;.\Src\fatfs\option;.\Src\gsm;.\Src\hc05;.\Src\rf433;.\Src\rs232;.\Src\rs485;.\Src\ethernet\inc;.\Src\freemodbus\modbus;.\Src\freemodbus\modbus\ascii;.\Src\freemodbus\modbus\rtu;.\Src\freemodbus\modbus\tcp;.\Src\freemodbus\modbus\include;.\Src\freemodbus\port;.\Src\freemodbus;.\Src\sht1x;.\Src\bh1750;.\Src\bmp180</IncludePath>
+              <IncludePath>.\User;.\Src;..\F4Lib\CMSIS\Device\ST\STM32F4xx\Include;..\F4Lib\CMSIS\Device\ST\STM32F4xx\Source\Templates\arm;..\F4Lib\STM32F4xx_StdPeriph_Driver\inc;.\Src\fatfs;.\Src\fatfs\option;.\Src\gsm;.\Src\hc05;.\Src\rf433;.\Src\rs232;.\Src\rs485;.\Src\ethernet\inc;.\Src\freemodbus\modbus;.\Src\freemodbus\modbus\ascii;.\Src\freemodbus\modbus\rtu;.\Src\freemodbus\modbus\tcp;.\Src\freemodbus\modbus\include;.\Src\freemodbus\port;.\Src\freemodbus;.\Src\sht1x;.\Src\bh1750;.\Src\bmp180;.\Src\mqtt</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -763,6 +763,21 @@
               <FileName>bh1750.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\Src\bh1750\bh1750.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>mqtt</GroupName>
+          <Files>
+            <File>
+              <FileName>GPRS_MQTTClient.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Src\mqtt\GPRS_MQTTClient.c</FilePath>
+            </File>
+            <File>
+              <FileName>SIM900TCPClient.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Src\mqtt\SIM900TCPClient.c</FilePath>
             </File>
           </Files>
         </Group>

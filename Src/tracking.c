@@ -78,7 +78,7 @@ void Tracking_Init(void)
 
 
     /* Compute the prescaler value */
-    PrescalerValue = (uint16_t) ((SystemCoreClock / 2) / 10000) - 1;
+    PrescalerValue = (uint16_t) ((SystemCoreClock) / 50000) - 1;
 
     /* Time base configuration */
     TIM_TimeBaseStructure.TIM_Period = 65535;
@@ -161,9 +161,9 @@ void addLogPackage(void)
             logRecord.rainSum = 0;
         }
         
-        logRecord.windSpeed = windSpeed;
-        logRecord.windDir = windDir;
-        logRecord.voltage = voltage;
+        logRecord.windSpeed = windSpeed_data;
+        logRecord.windDirect = windDir;
+        logRecord.voltage = voltage_power;
         
         logRecord.out0 = REL0_STT;
         logRecord.out1 = REL1_STT;
@@ -187,15 +187,16 @@ void addLogPackage(void)
   * @param  None
   * @retval None
   */
-void TIM3_IRQHandler(void)
+void TIM3_IRQHandler(void)	// 2S
 {
     if (TIM_GetITStatus(TIM3, TIM_IT_CC1) != RESET)
     {
         static uint8_t i = 0;
         TIM_ClearITPendingBit(TIM3, TIM_IT_CC1);
-
         capture = TIM_GetCapture1(TIM3);
         TIM_SetCompare1(TIM3, capture + CCR1_Val);
+		
+		
     }
 }
 
@@ -258,7 +259,7 @@ uint16_t AddTrackerPacket(MSG_STATUS_RECORD *logRecordSend, char *data, uint32_t
     sprintf(tmpBuf, "\"windspd\":%d,", logRecordSend->windSpeed);
     strcat(buff, tmpBuf);
     // wind dir
-    sprintf(tmpBuf, "\"winddir\":%d,", logRecordSend->windDir);
+    sprintf(tmpBuf, "\"winddir\":%d,", logRecordSend->windDirect);
     strcat(buff, tmpBuf);
     // rel0
     sprintf(tmpBuf, "\"rel0\":%d,", logRecordSend->out0);

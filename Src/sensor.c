@@ -38,13 +38,13 @@ int rainPanelTemp = 0;
 int windDir = 0;
 uint16_t windDir_disp = 0;  // display on plc
 int windDir_ADC = 0;
-int windSpeed = 0;
+int windSpeed_data = 0;
 float fwindSpeed = 0;
 // Rain Sum
 int rainSum = 0;
 
 // Voltage
-float voltage = 0;
+float voltage_power = 0;
 
 
 
@@ -256,7 +256,7 @@ int ADC_2_Degree(uint16_t val)
 {
     float _tmp = 0;
     
-    _tmp = (float)val / 4095 * 360;
+    _tmp = (float)val / 4000 * 360;
     
     if (_tmp < 0) _tmp += 360;
     if (_tmp > 360) _tmp -= 360;
@@ -325,7 +325,7 @@ void WindSpeed_Sampling(void)   // pulses per 1s
         
         latch_windspeed_cnt = windspeed_cnt; // for debug
         fwindSpeed = tmp; // for debug
-        windSpeed = (uint32_t)tmp;
+        windSpeed_data = (uint32_t)tmp;
         windspeed_cnt = 0;
         cnt = 0;
     }
@@ -504,7 +504,7 @@ void Sensor_Update(void)
     
     //----------------------------------------------------------------
     // Read Voltage
-    Read_Voltage(&voltage);
+    Read_Voltage(&voltage_power);
     
     //----------------------------------------------------------------
     // Start read SHT1x
@@ -513,34 +513,34 @@ void Sensor_Update(void)
     // Read Temperature
     if (SHT_readTemperatureC(&temperature))
     {
-        INFO("SHT Temp Error ...\n");
+//        INFO("SHT Temp Error ...\n");
         err_check++;
-        temperature = 0;
+        temperature = -1;
     }
     else 
     {
         if (temperature > 100 || temperature < 0)
         {
-            INFO("SHT Temp Error ...\n");
+//            INFO("SHT Temp Error ...\n");
             err_check++;
-            temperature = 0;
+            temperature = -1;
         }            
     } 
     
     // Read Humidity
     if (SHT_readHumidity(&humidity))
     {
-        INFO("SHT Humid Error ...\n");
+//        INFO("SHT Humid Error ...\n");
         err_check++;
-        humidity = 0;
+        humidity = -1;
     }
     else
     {
         if (humidity > 100 || humidity < 0)
         {
-            INFO("SHT Humid Error ...\n");
+//            INFO("SHT Humid Error ...\n");
             err_check++;
-            humidity = 0;
+            humidity = -1;
         }
     }
 
@@ -548,7 +548,6 @@ void Sensor_Update(void)
     //----------------------------------------------------------------
     // Start BMP & BH
     PressLight_Init();
-    delay_ms(100);
     
 //     // read air pressure
 //     if (BMP180_Read(&pa))
@@ -567,14 +566,14 @@ void Sensor_Update(void)
     }
     else
     {
-        INFO("BH1750 Error\n");
+//        INFO("BH1750 Error\n");
         err_check++;
-        lux = 0;
+        lux = -1;
     }
     
     if (err_check >= 5)
     {
-        INFO("Reset Sensor ... \n\n");
+//        INFO("Reset Sensor ... \n\n");
         err_check = 0;
         Sensor_Reset();
     }
@@ -586,7 +585,6 @@ void Sensor_Update(void)
     //----------------------------------------------------------------
     // Wind Dir
     // value is stored in windDir
-    
     //----------------------------------------------------------------
     // Rain Sum
     // Auto increase in EXTI

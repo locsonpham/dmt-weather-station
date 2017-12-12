@@ -88,10 +88,10 @@ void mbPolling(void)
     usRegHoldingBuf[1] = (uint16_t)(humidity * 10);
     usRegHoldingBuf[2] = (uint16_t)(lux);
     usRegHoldingBuf[3] = (uint16_t)(rainSum);
-    usRegHoldingBuf[4] = (uint16_t)(windSpeed);
+    usRegHoldingBuf[4] = (uint16_t)(windSpeed_data);
     usRegHoldingBuf[5] = (uint16_t)(windDir);
     // [6] reset rainSum
-    usRegHoldingBuf[7] = (uint16_t)(voltage * 10);
+    usRegHoldingBuf[7] = (uint16_t)(voltage_power * 10);
     // [8] REL0
     // [9] REL1
     // [10] REL2
