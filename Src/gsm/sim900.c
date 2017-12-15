@@ -16,9 +16,7 @@
 #include "at_command_parser.h"
 #include "uart.h"
 
-#ifdef MQTT_Client
-	#include "SIM900TCPClient.h"
-#endif
+#include "GPRS_MQTTClient.h"
 
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
@@ -142,14 +140,10 @@ void SIM_UART_Handler(void)
 		// Read one byte from the receive data register
 		data = USART_ReceiveData(SIM_COMM);
         
-		#ifdef MQTT_Client
-			Receive_ISR_routine(data);
-		#else
-			RINGBUF_Put(&UART1_RxRingBuff, data);
-			
-			// AT Command parser
-			AT_ComnandParser(data);
-		#endif
+		RINGBUF_Put(&UART1_RxRingBuff, data);
+		
+		// AT Command parser
+		AT_ComnandParser(data);
 	}
 }
 

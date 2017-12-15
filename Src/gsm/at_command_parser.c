@@ -128,11 +128,13 @@ uint8_t *gprsRecvPt;
 uint32_t gprsRecvDataLen;
 uint16_t gprsRecvFlag = 0;
 uint8_t  socketRecvFlag[SOCKET_NUM] = {0};
+uint16_t socketRecvLen[SOCKET_NUM] = {0};
+uint8_t gprsRxBuff[SOCKET_NUM][GPRS_DATA_MAX_LENGTH];
+
 uint8_t gprsLengthBuff[SOCKET_NUM][GPRS_KEEP_DATA_INFO_LENGTH] = {0};
 RINGBUF gprsRingLengthBuff[SOCKET_NUM];
 
 RINGBUF gprsRingBuff[SOCKET_NUM];
-uint8_t gprsRxBuff[SOCKET_NUM][GPRS_DATA_MAX_LENGTH];
 
 uint32_t gprsDataOffset = 0, tcpSocketStatus[SOCKET_NUM] = {SOCKET_CLOSE};
 uint32_t GPRS_dataUnackLength[SOCKET_NUM];
@@ -843,12 +845,12 @@ char GPRS_GetData(char c)
 		case 1:
 				if(c != ',') return 0;
 			break;
-		case 2:
-			if((c > '0') && (c <= '9'))
-				dataLen = c - '0';
-			else
-				return 0;
-			break;
+//		case 2:
+//			if((c > '0') && (c <= '9'))
+//				dataLen = c - '0';
+//			else
+//				return 0;
+//			break;
 		default:
 			switch(dataPhase)
 			{
@@ -871,16 +873,17 @@ char GPRS_GetData(char c)
 					{
 						dataPhase = GPRS_GET_DATA;
 						gprsRecvDataLen = 0;
+						socketRecvEnable = 1;
 					}
 					else 
 						return 0;
 					break;
 				case GPRS_GET_DATA:
-					//if(socketRecvEnable)
+					if(socketRecvEnable)
 					{
-// 						gprsRecvPt[gprsRecvDataLen] = c;
+ 						gprsRxBuff[socketNo][gprsRecvDataLen] = c;
  						gprsRecvDataLen++;
-                        RINGBUF_Put(&gprsRingBuff[socketNo], c);
+//                        RINGBUF_Put(&gprsRingBuff[socketNo], c);
 					}
                     
 					dataLen--;
@@ -888,6 +891,8 @@ char GPRS_GetData(char c)
 					{
                         gprsRecvFlag  = 1;
 						socketRecvFlag[socketNo] = 1;
+						socketRecvLen[socketNo] = gprsRecvDataLen;
+						gprsRxBuff[socketNo][gprsRecvDataLen] = '\0';
 						dataPhase = GPRS_FINISH;
 						return 0;
 					}

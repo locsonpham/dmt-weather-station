@@ -34,6 +34,8 @@ uint16_t mainWDG = 0;
 
 uint16_t resetCnt = 0;
 
+bool connect_flag = false;
+uint16_t len;
 
 float temp, humid, light, pressure, soilT, soilH;
 
@@ -67,8 +69,8 @@ uint16_t secServerPort;
 uint8_t  curServer[SOCKET_NUM];
 Timeout_Type tReConnectServer[SOCKET_NUM];
 
-char *server_domain = "device.demeter.vn";
-int server_port = 3000;
+char *server_domain = "m14.cloudmqtt.com";//"device.demeter.vn";//
+int server_port = 10457;//3000;//
 
 Timeout_Type tCheckPeriodSendData[SOCKET_NUM];
 Timeout_Type tTimeReCheckAck;
@@ -117,27 +119,16 @@ void init(void)
     
     // Config UART3 for debug
     UART_Config(USART3, 9600);
-	#ifdef MQTT_Client
-	/* Init sim900 */
-		SIM900_Init(9600);
-		while(!SIM900_Start());
-		TCPClient_Shut();
-		TCPClient_ConnectionMode(0);			/* 0 = Single; 1 = Multi */
-		TCPClient_ApplicationMode(0);			/* 0 = Normal Mode; 1 = Transperant Mode */
-		AttachGPRS();
-		//while(!(TCPClient_Connect(APN, USERNAME, PASSWORD)));
-	#else
 	/* Init GSM */
     InitTimeout(&tMODEMInit, 0);
     modemInitFlag = 1;	
     for(int i = 0;i < SOCKET_NUM;i++)
-	  {
+	{
         InitTimeout(&tReConnectServer[i], TIME_SEC(0));
         
         // If after 5min have no data sent then will close socket
-		    InitTimeout(&tCheckPeriodSendData[i], TIME_SEC(300));
-		}
-	#endif
+		InitTimeout(&tCheckPeriodSendData[i], TIME_SEC(300));
+	}
 }
 
 /**
@@ -379,11 +370,21 @@ void GPRS_Handler(uint8_t task)
                  INFO("Socket[%d] CLOSED -> Connect now \n", i);
                  if (MODEM_ConnectSocket(0, priServerIp, priServerPort, svUseIP) == 0)
                  {
-					 INFO("Connect server success !!!\n");
-                     InitTimeout(&tTimeReCheckAck, TIME_SEC(1));
-					 InitTimeout(&tCheckPeriodSendData[0], TIME_SEC(120));
-                     InitTimeout(&tTimeSync, TIME_SEC(1));
-					 InitTimeout(&tSendServer, TIME_SEC(1));
+					INFO("Connect server success !!!\n");
+					InitTimeout(&tTimeReCheckAck, TIME_SEC(1));
+					InitTimeout(&tCheckPeriodSendData[0], TIME_SEC(120));
+					InitTimeout(&tTimeSync, TIME_SEC(1));
+					InitTimeout(&tSendServer, TIME_SEC(1));
+
+					INFO("Send connect packet to MQTT server\n");
+					len = MQTT_connectpacket(mainBuf);
+					MODEM_GprsSendData(0,mainBuf, len);
+					delay_ms(200);
+				 
+					INFO("Send subscribe packet to MQTT server\n");
+					len = MQTT_subscribePacket(mainBuf,"HaoNguyen/feeds/test", 1);
+					MODEM_GprsSendData(0,mainBuf, len);
+					delay_ms(200);
                  }
                  else
                  {
@@ -435,8 +436,17 @@ void GPRS_Handler(uint8_t task)
                  {
                      if((MODEM_CheckGPRSDataOut(0) == 0)) // Data sent
                      {
-                         int i = 0;
-                         createReportedPackage((char *)mainBuf, &i);
+                        int i = 0;
+						char _buf[10];
+						memset(_buf, 0, 10);
+
+						//insert sensor value to MQTT packet
+						sprintf(_buf,"{%.1lf}",temperature);
+
+						//Create MQTT packet and Get length of this packet
+						i = MQTT_publishPacket(mainBuf, "demeter/field2/test", _buf, 1);
+
+                        //createReportedPackage((char *)mainBuf, &i);
                          if((i > 0) && (i < sizeof(mainBuf)))
                          {
                              MODEM_Info("Prepare to Send\n");
@@ -544,13 +554,6 @@ Output: None
 *******************************************************************************/
 int main(void)
 {
-	#ifdef MQTT_Client
-		long KeepAliveTime;
-		char _buf[10];
-		uint8_t _buffer[150];
-		uint16_t len;
-		bool connect_flag = false;
-	#endif	
     // Init
     init();
     
@@ -600,103 +603,23 @@ int main(void)
 			
 			InitTimeout(&tGetInfo, TIME_SEC(2));
 		}
-		
-	#ifdef MQTT_Client
-		if(connect_flag == false)
+		/* Receive DATA ---------------------------------------------------------------*/
+		if (socketRecvFlag[0])
 		{
-			MQTT_ConnectToServer();
-			len = MQTT_connectpacket(_buffer);
-			sendPacket(_buffer, len);
-			len = readPacket(_buffer, 1000);
+				 uint16_t length = gprsRecvDataLen[0];
+				 uint8_t __buff[20];
+				 uint8_t i = 0;
+				 gprsRecvFlag = 0;
+				 uint8_t mode = 0;
+				 socketRecvFlag[0]=0;	
+				MQTT_SubscribedData(gprsRxBuff[0],length,__buff,AIO_FEED);
+				INFO("MSG: Received Data: %s \n",gprsRxBuff[0]);//\" %s \" \n",UART1_RxRingBuff.pt);
 		}
-		else{}
-			
-		#ifdef PUBLISH_DEMO
-			if(TCPClient_connected())
-			{
-				connect_flag = true;
-			}
-			else
-			{
-				connect_flag = false;
-				TCPClient_Close();
-				delay_ms(500);
-			}
-			
-			if(connect_flag)
-			{
-				memset(_buffer, 0, 150);
-				memset(_buf, 0, 10);
-				sprintf(_buf,"{%.1lf}",temperature);
-				len = MQTT_publishPacket(_buffer, "demeter/field1/test", _buf, 1);/* topic format: "username/feeds/aio_feed" e.g. "Nivya151/feeds/test" */
-				sendPacket(_buffer, len);
-				
-				memset(_buffer, 0, 150);
-				memset(_buf, 0, 10);
-				sprintf(_buf,"{%.1lf}",humidity);
-				len = MQTT_publishPacket(_buffer, "demeter/field2/test", _buf, 1);/* topic format: "username/feeds/aio_feed" e.g. "Nivya151/feeds/test" */
-				sendPacket(_buffer, len);
-				
-				memset(_buffer, 0, 150);
-				memset(_buf, 0, 10);
-				sprintf(_buf,"{%d}",lux);
-				len = MQTT_publishPacket(_buffer, "demeter/field3/test", _buf, 1);/* topic format: "username/feeds/aio_feed" e.g. "Nivya151/feeds/test" */
-				sendPacket(_buffer, len);
-				
-				memset(_buffer, 0, 150);
-				memset(_buf, 0, 10);
-				sprintf(_buf,"{%.1f}",rainSum*1.0);
-				len = MQTT_publishPacket(_buffer, "demeter/field4/test", _buf, 1);/* topic format: "username/feeds/aio_feed" e.g. "Nivya151/feeds/test" */
-				sendPacket(_buffer, len);
-				
-				memset(_buffer, 0, 150);
-				memset(_buf, 0, 10);
-				sprintf(_buf,"{%.1f}",windSpeed_data*1.0);
-				len = MQTT_publishPacket(_buffer, "demeter/field5/test", _buf, 1);/* topic format: "username/feeds/aio_feed" e.g. "Nivya151/feeds/test" */
-				sendPacket(_buffer, len);
-				
-				memset(_buffer, 0, 150);
-				memset(_buf, 0, 10);
-				sprintf(_buf,"{%.1f}",windDir*1.0);
-				len = MQTT_publishPacket(_buffer, "demeter/field6/test", _buf, 1);/* topic format: "username/feeds/aio_feed" e.g. "Nivya151/feeds/test" */
-				sendPacket(_buffer, len);
-				delay_ms(50);
-			}
-			else{}
-				
-		#endif
 		
-		#ifdef SUBSRCIBE_DEMO
-			uint8_t valuePointer=0;
-			memset(_buffer, 0, 150);
-
-			len = MQTT_subscribePacket(_buffer, "HaoNguyen/feeds/test", 1);/* topic format: "username/feeds/aio_feed" e.g. "Nivya151/feeds/test" */
-			sendPacket(_buffer, len);
-			KeepAliveTime = (MQTT_CONN_KEEPALIVE * 1000L);
-			while(KeepAliveTime > 0)		/* Read subscription packets till Alive time */
-			{
-				len = readPacket(_buffer, 1000);
-				memset(_buf, 0, 10);
-				if(MQTT_SubscribedData(_buffer,len,(uint8_t* )_buf,AIO_FEED))
-				{
-					INFO("subsrcible data: %s \n",_buf);
-				}
-				delay_ms(1);
-				KeepAliveTime--;
-			}
-			if(TCPClient_connected()) 
-			{
-				TCPClient_Close();
-				connect_flag = false;
-			}
-			delay_ms(500);
-		#endif
-	#else
 		/* GSM Region ************************/
         GSM_Handler();
         GPRS_Handler(main_task);
-    /* END GSM Region *******************/
-	#endif
+		/* END GSM Region *******************/
         // Increase main_task
         main_task++;
     }

@@ -64,6 +64,9 @@ extern uint16_t gprsRecvFlag;
 extern RINGBUF gprsRingBuff[SOCKET_NUM];
 extern uint8_t  socketRecvFlag[SOCKET_NUM];
 
+extern uint16_t socketRecvLen[SOCKET_NUM];
+extern uint8_t gprsRxBuff[SOCKET_NUM][GPRS_DATA_MAX_LENGTH];
+
 /* Private function prototypes -----------------------------------------------*/
 /* GPRS & SMS */
 
